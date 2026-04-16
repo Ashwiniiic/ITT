@@ -1,0 +1,38 @@
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int sIdx = 0, pIdx = 0, lastWildcard = -1, sNextMatch = -1;
+        int n = s.length(), m = p.length();
+
+        while (sIdx < n) {
+            // Case 1: Characters match or pattern has '?'
+            if (pIdx < m && (p[pIdx] == s[sIdx] || p[pIdx] == '?')) {
+                sIdx++;
+                pIdx++;
+            } 
+            // Case 2: Pattern has '*'
+            else if (pIdx < m && p[pIdx] == '*') {
+                lastWildcard = pIdx; // Remember '*' position
+                sNextMatch = sIdx;   // Try matching '*' with 0 characters first
+                pIdx++;
+            } 
+            // Case 3: Current mismatch, but a previous '*' was found
+            else if (lastWildcard != -1) {
+                pIdx = lastWildcard + 1; // Backtrack pattern to after the '*'
+                sNextMatch++;            // Match the '*' with one more character from s
+                sIdx = sNextMatch;       // Reset sIdx to the new attempt
+            } 
+            // Case 4: Mismatch and no '*' to rescue
+            else {
+                return false;
+            }
+        }
+
+        // Check for remaining characters in pattern (only '*' allowed)
+        while (pIdx < m && p[pIdx] == '*') {
+            pIdx++;
+        }
+
+        return pIdx == m;
+    }
+};
