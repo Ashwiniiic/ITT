@@ -1,0 +1,53 @@
+#include <vector>
+#include <string>
+#include <unordered_set>
+
+using namespace std;
+
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> result;
+        vector<string> board(n, string(n, '.'));
+        
+        // Tracking sets for fast O(1) lookup
+        unordered_set<int> cols;
+        unordered_set<int> posDiag; // (r + c)
+        unordered_set<int> negDiag; // (r - c)
+        
+        backtrack(0, n, board, result, cols, posDiag, negDiag);
+        return result;
+    }
+
+private:
+    void backtrack(int r, int n, vector<string>& board, vector<vector<string>>& result,
+                   unordered_set<int>& cols, unordered_set<int>& posDiag, unordered_set<int>& negDiag) {
+        // Base case: All rows filled
+        if (r == n) {
+            result.push_back(board);
+            return;
+        }
+
+        for (int c = 0; c < n; c++) {
+            // If the position is under attack, skip it
+            if (cols.count(c) || posDiag.count(r + c) || negDiag.count(r - c)) {
+                continue;
+            }
+
+            // Place the queen
+            cols.insert(c);
+            posDiag.insert(r + c);
+            negDiag.insert(r - c);
+            board[r][c] = 'Q';
+
+            // Move to the next row
+            backtrack(r + 1, n, board, result, cols, posDiag, negDiag);
+
+            // Backtrack: Remove the queen and clear the sets
+            cols.erase(c);
+            posDiag.erase(r + c);
+            negDiag.erase(r - c);
+            board[r][c] = '.';
+        }
+    }
+};
